@@ -1,39 +1,47 @@
 
-Hello everyone my name is Alex and today I would like to start series of articles about gcd. Gcd or libdispatch is one the most popular instruments for multithreading programming in iOS and MacOS. Actually It's a library which was written in C to ease thread management. Indeed instead of manual creation of threads and their subsequent control we can use abstract queues and put on them all the responsibility of thread management.
-In that series we will consider basic primitives like queues and how to work with them, will research dispatch source and even touch dispatch io (which is not super popular tool). Also we will try to implement some basic applications and approaches that we can do in real world applications. And for the most curious we will try to implement gcd primitives ourselves.
-
-In this article I'll explain what is queues and how to work with them. The queue themselves manage thread pool that means they are not overlap with the threads. There are 2 types of queues: serial and concurrent. In serial queue all the tasks execute sequently.
+Hello everyone, I'm Alex and today I would like to start a series of articles about Grand Central Dispatch (GCD). GCD or libdispatch is one the most popular instruments for multithreading programming in iOS and MacOS. It's a library written in C to ease thread management. Instead of manual creation of threads and their subsequent control, we can use abstract queues and put all the responsibility of thread management on them.
+In the series, we will cover basic primitives like queues and how to work with them, research dispatch source, and touch on DispatchIO (which is not a super popular tool). We will try to implement some basic approaches that we can use in the real world applications. And for the most curious, we will try to implement GCD primitives ourselves.
 
 <!--
-More about internal structure of the queue.
+More about internal structure of the queue. What is queue? Stick to either queue or queues throughout.
+--> 
+In this first article, I'll explain queues and how to work with them. Queues manage thread pool which means they are do not overlap with the threads. There are two types of queues: serial and concurrent. In a serial queue, all the tasks execute sequentially.
+
+<!--
+Add headers
 --> 
 
-Here how we can create serial queue. As you see serial will be created by default without any specification.
-```swift
+Here is how we can create a serial queue. As shown in Code1, A serial queue is created by default without any specification.
+
+```swift 
+// Code1
 let serialQueue = DispatchQueue(label: "com.test.serialTest")
 ```
 
-In concurrent queue they execute in parallel. To specify it you need to see attributes parameter as `concurrent`.
+In contrast, a concurrent queue executes in parallel. You create the concurrent queue by setting `attributes` parameter to `concurrent`.
+
 ```swift
+//Code2
 let concurrentQueue = DispatchQueue(label: "com.test.concurrentTest", attributes: .concurrent)
 ```
 
-Label parameter which is used in both scenarios is the unique string identifier. It helps to find the queue in different debug tools. Since gcd queue are using through different frameworks there is a recommendation to choose reverse-DNS style.
+The `label` parameter used in both scenarios is a unique string identifier. It helps to find the queue in different debug tools. Since GCD queues are used through different frameworks, it is recommended you choose a reverse-DNS style.
 
-Actually if you look on the full signature of the `DispatchQueue` init you will notice that it has much more parameters. We we will discuss them later in this course. For now it's enough to create the queues.
+If you look at the full signature of class `DispatchQueue` init, you will notice that it has many more parameters. We we will discuss them later in the following articles. For now, it's enough to know how to create queues.
 
 
-Also there is a possibility to get a queue from the pool of queues. These queues are created by the system and they can be used for the system tasks so in the case you have a heavy task better to create your own queue instead of using global queue.
+There is also a possibility to fetch a queue from a pool of queues. These queues are created by an OS and can be used for system tasks. For heavy tasks, it is better to create your own queues instead of using global ones. 
+
 ```swift
 let globalQueue = DispatchQueue.global()
 ```
 
-All the global queues are concurrent but there is one exception in that rule - main queue. _This queue is serial and all the tasks that are queued on it are executed in the main thread_.
+All global queues are concurrent but there is one exception in that rule - main queue. _This queue is serial and all the tasks that are queued on it are executed in the main thread_.
 ```swift
 let mainQueue = DispatchQueue.main
 ```
 
-Let's discuss how to use the queues. Async and sync are 2 basic methods which we can use to interact with queues. Sync waits until the task will finish and async in other hand return control of execution after it starts the task. Here in the example you can see how async and sync will work for different types of queues.
+Let's discuss how to use queues. [End of Review] Async and sync are 2 basic methods which we can use to interact with queues. Sync waits until the task will finish and async in other hand return control of execution after it starts the task. Here in the example you can see how async and sync will work for different types of queues.
 
 <img width="1072" alt="async" src="https://user-images.githubusercontent.com/36634268/116522532-95d1ff00-a8d5-11eb-8881-101c4bd1f193.png">
 

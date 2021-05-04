@@ -5,10 +5,12 @@ In the series, we will cover basic primitives like queues and how to work with t
 # Dispatch queues
 In this first article, I'll explain dispatch queues and how to work with them. Basically queue based on the same principles as FIFO queue (one of the classical data structure primiteves). Let's make a short look what does the FIFO means. FIFO (First In First Out) is method of organizing data where the latest element (or head) in the data structure is processing first. To better understanding you can imagine line to the store in the real life. Queues manage thread pool which means they are do not overlap with the threads. There are two types of queues: serial and concurrent. In a serial queue, all the tasks execute sequentially.
 
-FIFO Enqueue
+FIFO Enqueue  
+
 <img width="875" alt="Enqueue" src="https://user-images.githubusercontent.com/36634268/116985072-496b3280-accc-11eb-8eb7-78fd878a4768.png">
 
-FIFO Dequeue
+FIFO Dequeue 
+
 <img width="809" alt="Dequeue" src="https://user-images.githubusercontent.com/36634268/116984681-cc3fbd80-accb-11eb-89f8-bdda55423620.png">
 
 Here is how we can create a serial queue. As shown in Code1, A serial queue is created by default without any specification.

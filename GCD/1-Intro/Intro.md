@@ -22,6 +22,10 @@ let serialQueue = DispatchQueue(label: "com.test.serialTest")
 
 In contrast, a concurrent queue executes in parallel. You create the concurrent queue by setting `attributes` parameter to `concurrent`.
 
+<!-- More about concurrent queue and threads -->
+
+<!-- Thread pool and thread explosion -->
+
 ```swift
 //Code2
 let concurrentQueue = DispatchQueue(label: "com.test.concurrentTest", attributes: .concurrent)

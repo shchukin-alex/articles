@@ -1,1 +1,0 @@
-This is the second part in the GCD series and today we will mostly discuss QOS and DispathItem. 

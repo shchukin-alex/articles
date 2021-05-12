@@ -54,6 +54,22 @@ test2
 All tasks were executed
 ```
 
+<!-- More complicated example for groups -->
+
 # ConcurrentPerform
 
+Sometimes we need to split our task into small pieces and execute them in parallel. For that kind of task Apple developers recommend us to use `concurrentPerform` method instead of calling for concurrent queue in a cycle. It's much more efficient since GCD manages the optimization of the thread usage itself and avoid *thread explosion* which can be caused by frequent usage of the concurrent queue.
+
+```swift
+DispatchQueue.concurrentPerform(iterations: 100) { _ in
+    // Execute part of the task
+}
+```
+
+<!-- Add more complicated example? -->
+
+<!--Performance comparison-->
+
 # Dispatch precondition
+
+Another useful instrument we will consider today `dispatchPrecondition`. It has similar logic with asserts in swift. Basically it prevent execution of the task if the queue is not following certain condition.

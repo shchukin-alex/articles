@@ -35,3 +35,10 @@ concurrentQueue.async {
 
 group.wait()
 print("All tasks were executed")
+
+
+// Concurrent perform
+
+DispatchQueue.concurrentPerform(iterations: 100) { _ in
+    // Execute part of the task
+}

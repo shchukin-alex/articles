@@ -42,3 +42,29 @@ print("All tasks were executed")
 DispatchQueue.concurrentPerform(iterations: 100) { _ in
     // Execute part of the task
 }
+
+// Dispatch precondition
+
+DispatchQueue.global().async {
+    dispatchPrecondition(condition: .onQueue(.main))
+
+    print("test")
+}
+
+DispatchQueue.global().async {
+    dispatchPrecondition(condition: .notOnQueue(.global()))
+
+    print("test")
+}
+
+DispatchQueue.global().async {
+    dispatchPrecondition(condition: .notOnQueue(.main))
+
+    print("test")
+}
+
+DispatchQueue.global().async {
+    dispatchPrecondition(condition: .notOnQueue(.main))
+
+    print("test")
+}

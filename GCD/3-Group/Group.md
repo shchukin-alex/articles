@@ -72,4 +72,44 @@ DispatchQueue.concurrentPerform(iterations: 100) { _ in
 
 # Dispatch precondition
 
-Another useful instrument we will consider today `dispatchPrecondition`. It has similar logic with asserts in swift. Basically it prevent execution of the task if the queue is not following certain condition.
+<!-- More about asserts and their usage -->
+
+Another useful instrument we will consider today `dispatchPrecondition`. It has similar logic with asserts in swift. Basically it prevents execution of the task if the queue is not following certain condition. In example below we want to be sure that the code will be executed only on main queue. That can be useful if we want to with the UI.
+
+```swift
+DispatchQueue.global().async {
+    dispatchPrecondition(condition: .onQueue(.main))
+
+    print("test")
+}
+```
+
+So as result you'll probably see an error similar to mine:
+<!-- Error image -->
+
+Or we don't want to use global queues for some heavy logic we have (as was mentioned before we should try to avoid using global queues because active usage of global queues can cause the thread explosion). Here how we can prevent that:
+
+```swift
+DispatchQueue.global().async {
+    dispatchPrecondition(condition: .notOnQueue(.global()))
+
+    print("test")
+}
+```
+
+It will be the same error which you've seen in previous example.
+
+There is an another parameter for dispatch precondition. For example we definitely want not to overload main queue with some calculations (you know we need to be super carefully executing tasks on the main thread).
+
+```swift
+DispatchQueue.global().async {
+    dispatchPrecondition(condition: .notOnQueue(.main))
+
+    print("test")
+}
+```
+
+Result:
+```
+test
+```

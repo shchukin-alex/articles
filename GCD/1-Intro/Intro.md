@@ -3,7 +3,7 @@ Today I would like to start a series of articles about Grand Central Dispatch (G
 In the series, we will cover basic primitives like queues and how to work with them, research dispatch source, and touch on DispatchIO (which is not a super popular tool). We will try to implement some basic approaches that we can use in the real world applications. And for the most curious, we will try to implement GCD primitives ourselves.
 
 # Dispatch queues
-In this first article, I'll explain dispatch queues and how to work with them. Basically queue based on the same principles as FIFO queue (one of the classical data structure primiteves). Let's make a short look what does the FIFO means. FIFO (First In First Out) is method of organizing data where the latest element (or head) in the data structure is processing first. To better understanding you can imagine line to the store in the real life. Queues manage thread pool which means they are do not overlap with the threads. There are two types of queues: serial and concurrent. In a serial queue, all the tasks execute sequentially.
+In this first article, I'll explain dispatch queues and how to work with them. Basically queue based on the same principles as FIFO queue (one of the classical data structure primiteves). Let's make a short look what does the FIFO means. FIFO (First In First Out) is method of organizing data where the latest element (or head) in the data structure is processing first. To better understanding you can imagine line to the store in the real life. There are two types of queues: serial and concurrent. In a serial queue, all the tasks execute sequentially.
 
 FIFO Enqueue  
 
@@ -22,14 +22,12 @@ let serialQueue = DispatchQueue(label: "com.test.serialTest")
 
 In contrast, a concurrent queue executes in parallel. You create the concurrent queue by setting `attributes` parameter to `concurrent`.
 
-<!-- More about concurrent queue and threads -->
-
-<!-- Thread pool and thread explosion -->
-
 ```swift
 //Code2
 let concurrentQueue = DispatchQueue(label: "com.test.concurrentTest", attributes: .concurrent)
 ```
+
+It's important to understand relation between queues and threads. First of all queue is an abstraction around the threads. There is a thread pool which is used by queues so each queue performs their tasks on the threads from that thread pool. Serial queue is limited by using only one arbitrary thread and in the contrast concurrent queue is available to use multiple threads for its tasks. Let's consider situation we split our work in the different pieces and run them on the concurrent queue. Concurrent queue will execute the tasks in the different threads. Since that the core can perform only one thread at the time we are quite limited in terms of parallel execution. This situation called *Thread explosion*. It's very heavy performance wise and in the worst case it can cause deadlock. That means we should be very careful with the usage of the concurrent queues and do not overload them with big amount of tasks. Another very good practice is to limit amount of serial queues and use *target queue hierarchy* per subsystem. We will take a close look at the *target queue hierarchy* in the following article. 
 
 The `label` parameter used in both scenarios is a unique string identifier. It helps to find the queue in different debug tools. Since GCD queues are used through different frameworks, it is recommended you choose a reverse-DNS style.
 

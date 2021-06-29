@@ -1,5 +1,84 @@
 This is the second part in the GCD series and today we will mostly discuss QOS and DispatchWorkItem. 
 
+# DispatchWorkItem
+
+There is another way to add task to the queue (async and sync with the closures we already discussed in the previous article) through special class which called DispatchWorkItem. It is an abstract class around the closure. This class provides additional methods to interaction with the task. For example, sometimes it is necessary to receive notification about the task is finished. For that case we create DispatchWorkItem and than call notify method with completion handler where we execute our task. We also specify in which queue (in the example below it's main queue) the tasks will be executed. Than we call async method for the queue (we already know how to create serial or concurrent queue from the previous article) with the DispatchWorkItem as the parameter.
+
+```swift
+let item = DispatchWorkItem {
+    print("test")
+}
+
+item.notify(queue: DispatchQueue.main) {
+    print("finish")
+}
+serialQueue.async(execute: item)
+```
+
+Result:
+```
+test
+finish
+```
+
+We can execute DispatchWorkItem manually using `perform` method as well:
+```swift
+let workItem = DispatchWorkItem {
+    print("test")
+}        
+workItem.perform()
+```
+
+Another useful case for DispatchWorkItem is ability to cancel tasks. To cancel the task we can call cancel method for DispatchWorkItem. There is a big limitation - the cancellation will work only if the task is not started yet. That means the task was enqueued to the queue but didn't start to execute. In that case calling method cancel will remove DispatchWorkItem from the queue.
+
+```swift
+serialQueue.async {
+    print("test1")
+    sleep(1)
+}
+
+serialQueue.async {
+    print("test2")
+    sleep(1)
+}
+
+let item = DispatchWorkItem {
+    print("test")
+}
+
+serialQueue.async(execute: item)
+
+item.cancel()
+```
+
+Result:
+```
+test1
+<- 1 second wait time ->
+test2
+```
+
+Another very handful method is `wait`. It blocks calling thread until work item will finish its task. Remember that's not good idea to call method `wait` on the main thread. The similar functionality we can see for `DispatchGroup` we will discuss it in the next article.
+
+```swift
+let workItem = DispatchWorkItem {
+    print("test1")
+    sleep(1)
+}
+serialQueue.async(execute: workItem)
+workItem.wait()
+print("test2")
+```
+
+Result:
+```
+test1
+<- 1 second wait time ->
+test2
+```
+
+There are plenty of flags you can set in the init of DispatchWorkItem most of them related to QoS but there  
+
 # QoS
 In modern apps we as developers usually try to find some balance between performance and battery usage. In other hand since we are working in concurrent environment we need to prioritize some our tasks based on their importance. For example user click button and an animation should be displayed in that case we understand high prioritization of the rendering task. Or another example, we want to run some cleanup task to remove temporary file and user shouldn't know any updates about this task we can say that will low prioritized issue.
 Quality of service is a single abstract parameter you can use to classify your work by its importance. There are four types of quality of service: `userInteractive`, `userInitiated`, `utility` and `background`. For the high priority task the application spend much more energy since it contributes more resources and for the low priority task it spend lower energy.
@@ -170,82 +249,3 @@ utilityQueue.async(execute: workItem)
 <!--  Priority inversion with sync  -->
 
 There are two other flags which were not discussed yet: `assignCurrentContext` and `detached` since they consider other attributes like `os_activity_t` and properties of the current IPC request. We will definitely explore them in the corresponding article.
-
-# DispatchWorkItem
-
-There is another way to add task to the queue (async and sync with the closures we already discussed in the previous article) through special class which called DispatchWorkItem. It is an abstract class around the closure. This class provides additional methods to interaction with the task. For example, sometimes it is necessary to receive notification about the task is finished. For that case we create DispatchWorkItem and than call notify method with completion handler where we execute our task. We also specify in which queue (in the example below it's main queue) the tasks will be executed. Than we call async method for the queue (we already know how to create serial or concurrent queue from the previous article) with the DispatchWorkItem as the parameter.
-
-```swift
-let item = DispatchWorkItem {
-    print("test")
-}
-
-item.notify(queue: DispatchQueue.main) {
-    print("finish")
-}
-serialQueue.async(execute: item)
-```
-
-Result:
-```
-test
-finish
-```
-
-We can execute DispatchWorkItem manually using `perform` method as well:
-```swift
-let workItem = DispatchWorkItem {
-    print("test")
-}        
-workItem.perform()
-```
-
-Another useful case for DispatchWorkItem is ability to cancel tasks. To cancel the task we can call cancel method for DispatchWorkItem. There is a big limitation - the cancellation will work only if the task is not started yet. That means the task was enqueued to the queue but didn't start to execute. In that case calling method cancel will remove DispatchWorkItem from the queue.
-
-```swift
-serialQueue.async {
-    print("test1")
-    sleep(1)
-}
-
-serialQueue.async {
-    print("test2")
-    sleep(1)
-}
-
-let item = DispatchWorkItem {
-    print("test")
-}
-
-serialQueue.async(execute: item)
-
-item.cancel()
-```
-
-Result:
-```
-test1
-<- 1 second wait time ->
-test2
-```
-
-Another very handful method is `wait`. It blocks calling thread until work item will finish its task. Remember that's not good idea to call method `wait` on the main thread. The similar functionality we can see for `DispatchGroup` we will discuss it in the next article.
-
-```swift
-let workItem = DispatchWorkItem {
-    print("test1")
-    sleep(1)
-}
-serialQueue.async(execute: workItem)
-workItem.wait()
-print("test2")
-```
-
-Result:
-```
-test1
-<- 1 second wait time ->
-test2
-```
-
-<!-- init flags barrier  -->

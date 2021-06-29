@@ -1,29 +1,18 @@
-
 Today I would like to start a series of articles about Grand Central Dispatch (GCD). GCD or libdispatch is one the most popular instruments for multithreading programming in iOS and MacOS. It's a library written in C to ease thread management. Instead of manual creation of threads and their subsequent control, we can use abstract queues and put all the responsibility of thread management on them.
 In the series, we will cover basic primitives like queues and how to work with them, research dispatch source, and touch on DispatchIO (which is not a super popular tool). We will try to implement some basic approaches that we can use in the real world applications. And for the most curious, we will try to implement GCD primitives ourselves.
 
 # Dispatch queues
-In this first article, I'll explain dispatch queues and how to work with them. Basically queue based on the same principles as FIFO queue (one of the classical data structure primiteves). Let's make a short look what does the FIFO means. FIFO (First In First Out) is method of organizing data where the latest element (or head) in the data structure is processing first. To better understanding you can imagine line to the store in the real life. There are two types of queues: serial and concurrent. In a serial queue, all the tasks execute sequentially.
+In this first article, I'll explain dispatch queues and how to work with them. Basically queue based on the same principles as FIFO queue (one of the classical data structure primitives).
 
-FIFO Enqueue  
-
-<img width="875" alt="Enqueue" src="https://user-images.githubusercontent.com/36634268/116985072-496b3280-accc-11eb-8eb7-78fd878a4768.png">
-
-FIFO Dequeue 
-
-<img width="809" alt="Dequeue" src="https://user-images.githubusercontent.com/36634268/116984681-cc3fbd80-accb-11eb-89f8-bdda55423620.png">
-
-Here is how we can create a serial queue. As shown in Code1, A serial queue is created by default without any specification.
+Here is how we can create a serial queue. As shown in the code below, a serial queue is created by default without any specification.
 
 ```swift 
-// Code1
 let serialQueue = DispatchQueue(label: "com.test.serialTest")
 ```
 
 In contrast, a concurrent queue executes in parallel. You create the concurrent queue by setting `attributes` parameter to `concurrent`.
 
 ```swift
-//Code2
 let concurrentQueue = DispatchQueue(label: "com.test.concurrentTest", attributes: .concurrent)
 ```
 

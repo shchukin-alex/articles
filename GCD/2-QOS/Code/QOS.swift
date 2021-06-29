@@ -84,6 +84,15 @@ let workItem = DispatchWorkItem(qos: .userInitiated, flags: .enforceQoS) {
 }
 utilityQueue.async(execute: workItem)
 
+// DispatchWorkItem perform
+
+let serialQueue = DispatchQueue(label: "com.test.serialQueue")
+
+let workItem = DispatchWorkItem {
+    print("test")
+}
+serialQueue.async(execute: workItem)
+
 // DispatchWorkItem notify
 
 let item = DispatchWorkItem {

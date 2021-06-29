@@ -175,8 +175,6 @@ There are two other flags which were not discussed yet: `assignCurrentContext` a
 
 There is another way to add task to the queue (async and sync with the closures we already discussed in the previous article) through special class which called DispatchWorkItem. It is an abstract class around the closure. This class provides additional methods to interaction with the task. For example, sometimes it is necessary to receive notification about the task is finished. For that case we create DispatchWorkItem and than call notify method with completion handler where we execute our task. We also specify in which queue (in the example below it's main queue) the tasks will be executed. Than we call async method for the queue (we already know how to create serial or concurrent queue from the previous article) with the DispatchWorkItem as the parameter.
 
-<!--  perform  -->
-
 ```swift
 let item = DispatchWorkItem {
     print("test")
@@ -192,6 +190,14 @@ Result:
 ```
 test
 finish
+```
+
+We can execute DispatchWorkItem manually using `perform` method as well:
+```swift
+let workItem = DispatchWorkItem {
+    print("test")
+}        
+workItem.perform()
 ```
 
 Another useful case for DispatchWorkItem is ability to cancel tasks. To cancel the task we can call cancel method for DispatchWorkItem. There is a big limitation - the cancellation will work only if the task is not started yet. That means the task was enqueued to the queue but didn't start to execute. In that case calling method cancel will remove DispatchWorkItem from the queue.

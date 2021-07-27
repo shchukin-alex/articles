@@ -133,3 +133,21 @@ let workItem = DispatchWorkItem {
 serialQueue.async(execute: workItem)
 workItem.wait()
 print("test2")
+
+// DispatchWorkItem barrier
+
+let concurrentQueue = DispatchQueue(label: "com.test.concurrent", attributes: .concurrent)
+
+let workItem = DispatchWorkItem(flags: .barrier) {
+    print("test2")
+    sleep(3)
+}
+
+concurrentQueue.async {
+    print("test1")
+    sleep(3)
+}
+concurrentQueue.async(execute: workItem)
+concurrentQueue.async {
+    print("test3")
+}

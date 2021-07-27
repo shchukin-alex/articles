@@ -1,8 +1,8 @@
-This is the second part in the GCD series and today we will mostly discuss QOS and DispatchWorkItem. 
+This is the second part in the GCD series and here we will mostly discuss `QoS` and `DispatchWorkItem`. 
 
 # DispatchWorkItem
 
-There is another way to add task to the queue (async and sync with the closures we already discussed in the previous article) through special class which called DispatchWorkItem. It is an abstract class around the closure. This class provides additional methods to interaction with the task. For example, sometimes it is necessary to receive notification about the task is finished. For that case we create DispatchWorkItem and than call notify method with completion handler where we execute our task. We also specify in which queue (in the example below it's main queue) the tasks will be executed. Than we call async method for the queue (we already know how to create serial or concurrent queue from the previous article) with the DispatchWorkItem as the parameter.
+There is a way to add a task to the queue through special class called `DispatchWorkItem` instead of direct passing the closure to `async` or `sync` methods. This class provides additional methods to interaction with the task. For example, sometimes it is necessary to receive completion notification. In that case we need to call method `notify` and pass completion block. We also need to specify in which queue (in the example below it's the main queue) the completion will be executed.
 
 ```swift
 let item = DispatchWorkItem {
@@ -21,7 +21,7 @@ test
 finish
 ```
 
-We can execute DispatchWorkItem manually using `perform` method as well:
+We can also execute DispatchWorkItem manually using `perform` method:
 ```swift
 let workItem = DispatchWorkItem {
     print("test")
@@ -29,7 +29,7 @@ let workItem = DispatchWorkItem {
 workItem.perform()
 ```
 
-Another useful case for DispatchWorkItem is ability to cancel tasks. To cancel the task we can call cancel method for DispatchWorkItem. There is a big limitation - the cancellation will work only if the task is not started yet. That means the task was enqueued to the queue but didn't start to execute. In that case calling method cancel will remove DispatchWorkItem from the queue.
+Another useful case for DispatchWorkItem is ability to cancel tasks through `cancel` method in `DispatchWorkItem`. But there is a limitation: the cancellation will work only if the task have not started yet. Let's how it works in the example below:
 
 ```swift
 serialQueue.async {
@@ -58,7 +58,7 @@ test1
 test2
 ```
 
-Another very handful method is `wait`. It blocks calling thread until work item will finish its task. Remember that's not good idea to call method `wait` on the main thread. The similar functionality we can see for `DispatchGroup` we will discuss it in the next article.
+Another very useful method is `wait`. It blocks calling thread until `DispatchWorkItem` finishes its task. Remember that's not a good idea to call method `wait` on the main thread. The similar functionality we can see for `DispatchGroup` we will discuss it in the next article.
 
 ```swift
 let workItem = DispatchWorkItem {
@@ -77,11 +77,38 @@ test1
 test2
 ```
 
-There are plenty of flags you can set in the init of DispatchWorkItem most of them related to QoS but there  
+There are plenty of flags you can set in the init of `DispatchWorkItem` most of them related to `QoS` but one can be considered out of QoS context. It's called barrier and it's actually pretty similar to other barriers functionality we consider in these series. The key idea is that the work item is created with this parameter and added to the concurrent queue will wait until all the tasks in that queue will be finished and will block execution of others until it will not finish. For better understanding let's check how it work in the example below:
+
+```swift
+let concurrentQueue = DispatchQueue(label: "com.test.concurrent", attributes: .concurrent)
+
+let workItem = DispatchWorkItem(flags: .barrier) {
+    print("test2")
+    sleep(3)
+}
+
+concurrentQueue.async {
+    print("test1")
+    sleep(3)
+}
+concurrentQueue.async(execute: workItem)
+concurrentQueue.async {
+    print("test3")
+}
+```
+
+Result:
+```
+test1
+<- 3 seconds ->
+test2
+<- 3 seconds ->
+test3
+```
 
 # QoS
-In modern apps we as developers usually try to find some balance between performance and battery usage. In other hand since we are working in concurrent environment we need to prioritize some our tasks based on their importance. For example user click button and an animation should be displayed in that case we understand high prioritization of the rendering task. Or another example, we want to run some cleanup task to remove temporary file and user shouldn't know any updates about this task we can say that will low prioritized issue.
-Quality of service is a single abstract parameter you can use to classify your work by its importance. There are four types of quality of service: `userInteractive`, `userInitiated`, `utility` and `background`. For the high priority task the application spend much more energy since it contributes more resources and for the low priority task it spend lower energy.
+In modern apps we as developers usually try to find some balance between performance and battery usage. Since we work in concurrent environment we need to prioritize some our tasks based on their importance. For example the user clicks a button and an animation should be displayed. In that case we want the high prioritization of the rendering task. Or another example, we want to run some cleanup task of removing temporary files and the user shouldn't receive any updates from this task so we can say that is low prioritized issue.
+Quality of service is a single abstract parameter you can use to classify your work by its importance. There are four types of quality of service: `userInteractive`, `userInitiated`, `utility` and `background`. For the high priority task the application spends much more energy since it consumes more resources and for the low priority task it spends lower energy.
 
 `userInteractive` - for tasks based on the user interaction like refreshing user interface or performing rendering. The main thread of the application always comes with `userInteractive` mode.
 
@@ -94,13 +121,13 @@ Quality of service is a single abstract parameter you can use to classify your w
 There are two additional QoS classes `default` and `unspecified` that developers should not use directly
 
 `default` - according Apple documentation, priority level of this QoS is between `userInitiated` and `utility`.
-`unspecified` - it means the absence of the information about QoS and expects it will be propagated (we will explore in the next paragraph).
+`unspecified` - means the absence of the information about QoS and expects it will be propagated (we will explore in the next paragraph).
 
-Interesting fact, for the global queue default QoS value is `default`:
+Interesting fact, for the global queue if we don't specify QoS the value should be `default`:
 ```swift
 class func global(qos: DispatchQoS.QoSClass = .default) -> DispatchQueue
 ```
-But if we call it will display `unspecified` value:
+But in fact it has `unspecified` value:
 
 ```swift
 print(DispatchQueue.global().qos.qosClass)
@@ -113,9 +140,9 @@ unspecified
 background
 ```
 
-# QOS propagation
+# QoS propagation
 
-Another important thing to understand is how QoS can be propagated between queues. As I mentioned before main thread is associated with `userInteractive` value. That's means all the tasks you are executing on the main thread will take the high priority.
+Another important thing to understand is how QoS can be propagated between queues. As I mentioned before main thread is associated with `userInteractive` value. That's means all the tasks you are executing on the main thread will take the highest priority.
 
 ```swift
 DispatchQueue.main.async {
@@ -128,7 +155,7 @@ Result:
 userInteractive
 ```
 
-In case whe don't specify qos directly for our queue it will acquire the qos from the calling thread. As you can see in the example below we don't specify the QoS for the serial queue and it's captured it automatically from the calling utility queue. That mechanics called automatic propagation.
+In case when we don't specify QoS directly in the queue it acquires the QoS from the calling thread. As you can see in the example below we don't specify the QoS for the serial queue and it captures it automatically from the calling utility queue. This mechanics is called automatic propagation.
 
 ```swift
 let serialQueue = DispatchQueue(label: "com.test.serial")
@@ -145,7 +172,7 @@ Result:
 utility
 ```
 
- There is one important exception for previous rule - if we add the task to our queue from the `userInteractive` thread (or main thread) it will automatically decreased from `userInteractive` to `userInitiated`. 
+ There is one important exception for the previous rule - if we add the task to the queue from the `userInteractive` thread (or main thread) it automatically drops from `userInteractive` to `userInitiated`. 
 
 ```swift
 DispatchQueue.main.async {
@@ -159,7 +186,7 @@ Result:
 userInitiated
 ```
 
-But this rule doesn't work backwards. It means we are calling from the low priority thread the high priority task it will keep it's own high priority. In the example below the calling queue (utilityQueue) has less priority than called queue (userInitiatedQueue) so the task of the called queue will be executed in the `userInitiated` mode.
+ Also this rule doesn't work backwards. It means if we call from the low priority thread the high priority task it keeps it's own high priority. In the example below the calling queue (utilityQueue) has low priority compare to the called queue (userInitiatedQueue) so the task of the called queue to be executed in `userInitiated` mode.
 
 ```swift
 utilityQueue.async {
@@ -175,9 +202,7 @@ utility
 userInitiated
 ```
 
-Ok let's consider situation when we need directly to specify QoS of the executing task. To do that we can set QoS as parameter for the async or sync methods of the serialQueue we created before. Or we can associate queue with specific QoS on it's set it as parameter on its creation.
-
-<!-- utilityQueue.async(qos: .userInitiated) ??  -->
+Let's consider case when we need directly to specify QoS of the executing task. To do that we can set QoS as parameter for `async` or `sync` methods of the serialQueue we created before. Or we can associate the queue with specific QoS and set it as parameter on its creation.
 
 ```swift
 let serialQueue = DispatchQueue(label: "com.test.serial")
@@ -199,7 +224,7 @@ Result:
 utility
 ```
 
-Ok now we know how to use QoS with the queues but there is more sophisticated cases with `DispatchWorkItem`. Using flags parameter on creation DispatchWorkItem we can define how QoS will be propagated to the task (or not). The first flag we consider called `inheritQoS` it means that the executed task will prefer to assign QoS from calling thread.
+Ok now we know how to use QoS with the queues but there are more sophisticated cases with `DispatchWorkItem`. Using the flags parameter in the init we can define how QoS will be propagated to the task (or not). The first flag we consider called `inheritQoS` it means that the executed task will prefer to assign QoS from calling thread.
 
 ```swift
 utilityQueue.async {
@@ -221,7 +246,7 @@ Result:
 utility
 ```
 
-Another flag called `enforceQoS` and has the opposite functionality with the previous one. In this case the task will acquire QoS from the `DispatchWorkItem`.
+Another flag called `enforceQoS` and has reverse functionality with the previous one. In this case the task will acquire QoS from the `DispatchWorkItem`.
 
 ```swift
 let workItem = DispatchWorkItem(qos: .userInitiated, flags: .enforceQoS) {
@@ -234,7 +259,7 @@ Result:
 userInitiated
 ```
 
-There one important addition to this functionality. Let's say we have serial queue and its QoS is `utility` and there is already task added to the queue (since it's doesn't have any flags it also has QoS `utility`). This situation causes the Priority Inversion and GCD automatically resolves it raising QoS of low prioritized task. That's is not visible to the developer since it's causing by GCD. But ofc we need to keep it in mind developing concurrent application.
+There is one important addition to that functionality. Let's say we have serial queue and its QoS is `utility` and there is already task added to the queue (since it's doesn't have any flags it also has QoS `utility`). This situation causes the Priority Inversion and GCD automatically resolves it raising the QoS of low prioritized task. That is not visible to the developer since it's causing by GCD. But ofc we need to keep it in mind developing concurrent applications.
 
 ```swift
 utilityQueue.async {
@@ -249,3 +274,5 @@ utilityQueue.async(execute: workItem)
 <!--  Priority inversion with sync  -->
 
 There are two other flags which were not discussed yet: `assignCurrentContext` and `detached` since they consider other attributes like `os_activity_t` and properties of the current IPC request. We will definitely explore them in the corresponding article.
+
+So in this part we discussed pretty complicated moments related `QoS`. In the next article we will look on `DispatchGroup` and ways to work with it.

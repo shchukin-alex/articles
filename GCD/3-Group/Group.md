@@ -72,8 +72,6 @@ DispatchQueue.concurrentPerform(iterations: 100) { _ in
 
 # Dispatch precondition
 
-<!-- More about asserts and their usage -->
-
 Another useful instrument we will consider today `dispatchPrecondition`. It has similar logic with asserts in swift. Basically it prevents execution of the task if the queue is not following certain condition. In example below we want to be sure that the code will be executed only on main queue. That can be useful if we want to with the UI.
 
 ```swift

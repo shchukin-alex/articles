@@ -75,3 +75,5 @@ Result = 1
 # Sync
 
 # Barrier
+
+Dispatch barrier is considered as one of the most effective ways of synchronization. Indeed it blocks the resource only on the writing but does not on the reading. So we can build our asynchronous application in a way to minimize blocking amount.

@@ -25,15 +25,15 @@ class ViewController: UIViewController {
 //        dispatchWorkItemTest()
 //        testDispatchWorkItemQoSFlags()
 
-//        preconditionTest()
+        preconditionTest()
 //        testSemaphore()
 //        testDispatchWorkItemBarrier()
-        testConcurrentPerform()
+//        testConcurrentPerform()
     }
 
     func preconditionTest() {
         DispatchQueue.global().async {
-            dispatchPrecondition(condition: .notOnQueue(.main))
+            dispatchPrecondition(condition: .notOnQueue(.global()))
 
             print("test")
         }

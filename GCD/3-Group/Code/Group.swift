@@ -68,3 +68,32 @@ DispatchQueue.global().async {
 
     print("test")
 }
+
+// Fibonacci
+
+func fibonacci(n: Int) -> Int {
+    if n <= 1 {
+        return n
+    }
+    return fibonacci(n: n - 1) + fibonacci(n: n - 2)
+}
+
+let parameters: [Int] = (0..<8).map { _ in Int.random(in: 35...42) }
+
+func concurrentPerformFibonacci() {
+    DispatchQueue.concurrentPerform(iterations: parameters.count) { i in
+        _ = fibonacci(n: parameters[i])
+    }
+}
+
+func asyncFibonacci() {
+    let group = DispatchGroup()
+    for i in 0..<parameters.count {
+        group.enter()
+        self.concurrentQueue.async {
+            _ = self.fibonacci(n: self.parameters[i])
+            group.leave()
+        }
+    }
+    group.wait()
+}

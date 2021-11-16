@@ -25,10 +25,12 @@ class ViewController: UIViewController {
 //        dispatchWorkItemTest()
 //        testDispatchWorkItemQoSFlags()
 
-        preconditionTest()
+//        preconditionTest()
 //        testSemaphore()
 //        testDispatchWorkItemBarrier()
 //        testConcurrentPerform()
+        
+        TestBarrier().testBarrier()
     }
 
     func preconditionTest() {

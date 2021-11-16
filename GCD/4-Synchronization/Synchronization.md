@@ -76,4 +76,4 @@ Result = 1
 
 # Barrier
 
-Dispatch barrier is considered as one of the most effective ways of synchronization. Indeed it blocks the resource only on the writing but does not on the reading. So we can build our asynchronous application in a way to minimize blocking amount.
+If you remember in the article about Quality of Service we discussed `barrier` flag for the the `DispatchWorkItem` here you will see that is the similar logic. Dispatch barrier is considered as one of the most effective ways of synchronization. Indeed it blocks the resource only on the writing but does not on the reading. So we can build our asynchronous application in a way to minimize blocking amount.

@@ -18,6 +18,7 @@
 		C8D26048264EB3CF00616852 /* Synchronization.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D26047264EB3CF00616852 /* Synchronization.swift */; };
 		C8D68B922694CA0D005D7EA0 /* ConcurrentPerform.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8D68B912694CA0D005D7EA0 /* ConcurrentPerform.swift */; };
 		C8E3C9AB26BEA59C0038F101 /* GCDTestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8E3C9AA26BEA59C0038F101 /* GCDTestTests.swift */; };
+		FA4CA68C2735983B0043D5BC /* BarrierTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA4CA68B2735983B0043D5BC /* BarrierTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +47,7 @@
 		C8E3C9A826BEA59C0038F101 /* GCDTestTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GCDTestTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8E3C9AA26BEA59C0038F101 /* GCDTestTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GCDTestTests.swift; sourceTree = "<group>"; };
 		C8E3C9AC26BEA59C0038F101 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		FA4CA68B2735983B0043D5BC /* BarrierTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarrierTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -98,6 +100,7 @@
 				C8C97D8D26456C1900988131 /* QoSTests.swift */,
 				C8D26047264EB3CF00616852 /* Synchronization.swift */,
 				C8D68B912694CA0D005D7EA0 /* ConcurrentPerform.swift */,
+				FA4CA68B2735983B0043D5BC /* BarrierTests.swift */,
 			);
 			path = GCDTest;
 			sourceTree = "<group>";
@@ -218,6 +221,7 @@
 				C8C97D762643F13A00988131 /* AppDelegate.swift in Sources */,
 				C8C97D782643F13A00988131 /* SceneDelegate.swift in Sources */,
 				C8C97D8B26456C0B00988131 /* DispatchWorkItemTests.swift in Sources */,
+				FA4CA68C2735983B0043D5BC /* BarrierTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

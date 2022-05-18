@@ -51,6 +51,42 @@ group.notify(queue: .global()) {
     print("Result = \(resource)")
 }
 
+// Queue Synchronization
+
+let queue = DispatchQueue(label: "com.test.serial")
+
+private var internalResource: Int = 0
+var resource: Int {
+    get {
+        queue.sync {
+            print("Read \(internalResource)")
+            sleep(1) // Imitation of long work
+            return internalResource
+        }
+    }
+    set {
+        queue.sync {
+            print("Write \(newValue)")
+            sleep(1) // Imitation of long work
+            internalResource = newValue
+        }
+    }
+}
+
+func testQueueSynchronization() {
+    for i in 0..<10 {
+        if i % 2 == 0 {
+            DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(Int.random(in: 1...5))) {
+                self.resource = i
+            }
+        } else {
+            DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(Int.random(in: 1...5)))  {
+                _ = self.resource
+            }
+        }
+    }
+}
+
 // Dispatch barrier synchronization
 
 let queue = DispatchQueue(label: "com.test.concurrent", attributes: .concurrent)

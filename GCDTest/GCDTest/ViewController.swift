@@ -30,7 +30,15 @@ class ViewController: UIViewController {
 //        testDispatchWorkItemBarrier()
 //        testConcurrentPerform()
         
-        TestBarrier().testBarrier()
+//        TestBarrier().testBarrier()
+//        TestQueueSynchronization().testQueueSynchronization()
+//        testTimerDispatchSource()
+//        testMemoryDispatchSource()
+//        testSignalSource()
+//        testProcessSource()
+
+//        testTargetQueueHierarchy()
+        testAddDispatchSource()
     }
 
     func preconditionTest() {
